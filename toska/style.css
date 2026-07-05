@@ -529,6 +529,7 @@ img { max-width: 100%; display: block; }
   .page-dots { right: 8px; gap: 8px; }
   .dot { width: 6px; height: 6px; }
 
+  .hero-bg { background-position: 68% center; }
   .hero-subtitle { font-size: 48px; font-weight: 300; letter-spacing: 12px; }
   .hero-title { font-size: 20px; letter-spacing: 2px; }
   .hero-content { padding: 40vh 24px 80px; }
@@ -539,5 +540,6 @@ img { max-width: 100%; display: block; }
   .register-grid { grid-template-columns: 1fr; }
   .footer-links { grid-template-columns: 1fr; gap: 32px; }
 
-  .page-section { padding: 64px 24px; }
+  .page-section { padding: 64px 24px; align-items: flex-start; }
+  .page-footer { align-items: flex-start; }
 }

@@ -68,6 +68,10 @@ function goTo(index) {
 
   pages.style.transform = `translateY(-${current * 100}vh)`;
 
+  // Reset scroll position of the new page to top
+  const nextPage = document.querySelector(`.page[data-page="${current}"]`);
+  if (nextPage) nextPage.scrollTop = 0;
+
   // Update dots
   dots.forEach((d, i) => d.classList.toggle('active', i === current));
 
@@ -77,25 +81,50 @@ function goTo(index) {
   setTimeout(() => { busy = false; }, 750);
 }
 
+function getPageEl() {
+  return document.querySelector(`.page[data-page="${current}"]`);
+}
+
+function isAtTop() {
+  const p = getPageEl();
+  return p && p.scrollTop <= 2;
+}
+
+function isAtBottom() {
+  const p = getPageEl();
+  return p && p.scrollTop + p.clientHeight >= p.scrollHeight - 5;
+}
+
 // ── Wheel ─────────────────────────────────────────────────────
 window.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  if (e.deltaY > 20) goTo(current + 1);
-  else if (e.deltaY < -20) goTo(current - 1);
+  if (e.deltaY > 20) {
+    if (!isAtBottom()) return;
+    e.preventDefault();
+    goTo(current + 1);
+  } else if (e.deltaY < -20) {
+    if (!isAtTop()) return;
+    e.preventDefault();
+    goTo(current - 1);
+  }
 }, { passive: false });
 
 // ── Touch ─────────────────────────────────────────────────────
 let touchStartY = 0;
 window.addEventListener('touchstart', (e) => {
   touchStartY = e.touches[0].clientY;
-});
+}, { passive: true });
 window.addEventListener('touchend', (e) => {
   const dy = touchStartY - e.changedTouches[0].clientY;
-  if (Math.abs(dy) > 40) {
-    if (dy > 0) goTo(current + 1);
-    else goTo(current - 1);
+  if (Math.abs(dy) <= 40) return;
+
+  if (dy > 0) {
+    if (!isAtBottom()) return;
+    goTo(current + 1);
+  } else {
+    if (!isAtTop()) return;
+    goTo(current - 1);
   }
-});
+}, { passive: true });
 
 // ── Keyboard ──────────────────────────────────────────────────
 window.addEventListener('keydown', (e) => {

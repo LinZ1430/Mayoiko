@@ -1,0 +1,46 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #ffffff;
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.back-link {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 100;
+  font-size: 14px;
+  color: #666;
+  text-decoration: none;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: color 0.3s;
+}
+
+.back-link:hover { color: #b8933a; }
+
+/* ===== BG Layer ===== */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ===== Event Layer ===== */
+.event-layer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.event-layer img {
+  width: 100%;
+  display: block;
+}
