@@ -166,12 +166,10 @@ img {
 
 .hero-subtitle {
   font-size: 72px;
-  font-weight: 700;
-  color: var(--accent);
+  font-weight: 300;
+  color: #1a1a1a;
   letter-spacing: 24px;
-  margin-right: -24px;
   margin-bottom: 20px;
-  text-shadow: 0 0 60px var(--accent-glow);
 }
 
 .hero-divider {
@@ -540,8 +538,8 @@ img {
 
   .hero-subtitle {
     font-size: 48px;
+    font-weight: 300;
     letter-spacing: 12px;
-    margin-right: -12px;
   }
 
   .hero-title {
