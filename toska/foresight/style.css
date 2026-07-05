@@ -70,7 +70,7 @@ body {
   font-weight: 700;
   letter-spacing: 6px;
   color: #1a1a1a;
-  animation: splash-pulse 1.5s ease-in-out infinite;
+  animation: splash-pulse 4s ease-in-out infinite;
 }
 
 @keyframes splash-pulse {
