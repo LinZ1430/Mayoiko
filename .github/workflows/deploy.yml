@@ -22,4 +22,7 @@ jobs:
             -r ${{ secrets.COS_REGION }}
 
       - name: Sync to COS
-        run: coscmd upload -rs . --delete --ignore ".git/*,.github/*"
+        run: |
+          coscmd upload -rs ./ --delete \
+            --ignore ".git/*" \
+            --ignore ".github/*"
