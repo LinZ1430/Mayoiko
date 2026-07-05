@@ -10,10 +10,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: zkqiang/tencent-cos-action@v1
-        with:
-          args: upload -r ./ / --delete --ignore .git/,.github/
-          secret_id: ${{ secrets.COS_SECRET_ID }}
-          secret_key: ${{ secrets.COS_SECRET_KEY }}
-          bucket: ${{ secrets.COS_BUCKET }}
-          region: ${{ secrets.COS_REGION }}
+      - name: Install coscmd
+        run: pip install coscmd
+
+      - name: Test connection
+        run: |
+          coscmd config \
+            -a ${{ secrets.COS_SECRET_ID }} \
+            -s ${{ secrets.COS_SECRET_KEY }} \
+            -b ${{ secrets.COS_BUCKET }} \
+            -r ${{ secrets.COS_REGION }}
+          coscmd list
+          echo "--- Connection OK ---"
+
+      - name: Upload
+        run: coscmd upload -r ./ /
