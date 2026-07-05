@@ -167,41 +167,25 @@ img { max-width: 100%; display: block; }
   to   { clip-path: inset(0 0 0 100%); }
 }
 
-/* Mobile: transform slide (GPU) */
+/* Mobile: vertical wipe */
 @media (max-width: 768px) {
   .page[data-page] { --enter-speed: 1s; --exit-speed: 0.8s; }
 
-  .page { will-change: transform; }
-  .page.active { clip-path: none; }
-
-  .page.entering.fwd {
-    animation: slide-up-in var(--enter-speed) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  @keyframes enter-from-right {
+    from { clip-path: inset(100% 0 0 0); }
+    to   { clip-path: inset(0 0 0 0); }
   }
-  .page.leaving.fwd {
-    animation: slide-up-out var(--exit-speed) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  @keyframes exit-to-left {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(0 0 100% 0); }
   }
-  .page.entering.rev {
-    animation: slide-down-in var(--enter-speed) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  @keyframes enter-from-left {
+    from { clip-path: inset(0 0 100% 0); }
+    to   { clip-path: inset(0 0 0 0); }
   }
-  .page.leaving.rev {
-    animation: slide-down-out var(--exit-speed) cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  @keyframes slide-up-in {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
-  }
-  @keyframes slide-up-out {
-    from { transform: translateY(0); }
-    to   { transform: translateY(-100%); }
-  }
-  @keyframes slide-down-in {
-    from { transform: translateY(-100%); }
-    to   { transform: translateY(0); }
-  }
-  @keyframes slide-down-out {
-    from { transform: translateY(0); }
-    to   { transform: translateY(100%); }
+  @keyframes exit-to-right {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(100% 0 0 0); }
   }
 }
 
