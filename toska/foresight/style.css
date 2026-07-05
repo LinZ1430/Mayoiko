@@ -18,7 +18,7 @@ body {
   transition: color 0.3s;
 }
 
-.back-link:hover { color: #b8933a; }
+.back-link:hover { color: hsl(95, 70%, 40%); }
 
 /* ===== BG Layer ===== */
 .bg-layer {
@@ -99,7 +99,7 @@ body {
 .splash-bar {
   height: 100%;
   width: 0%;
-  background: #b8933a;
+  background: hsl(95, 70%, 40%);
 }
 
 .splash-pct {

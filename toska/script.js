@@ -1,5 +1,4 @@
 const pages = document.getElementById('pages');
-const dots = document.querySelectorAll('.dot');
 const nav = document.getElementById('nav');
 const navToggle = document.getElementById('nav-toggle');
 const splash = document.getElementById('splash');
@@ -102,9 +101,6 @@ function goTo(index, pushState = true) {
     busy = false;
   }, duration + 50);
 
-  // Update dots
-  dots.forEach((d, i) => d.classList.toggle('active', i === current));
-
   // Update nav
   nav.classList.toggle('scrolled', current > 0);
 
@@ -132,7 +128,6 @@ if (window.location.hash) {
   if (idx >= 0) {
     current = idx;
     allPages[idx].classList.add('active');
-    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
     nav.classList.toggle('scrolled', idx > 0);
   }
 } else {
@@ -165,11 +160,6 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowUp'   || e.key === 'PageUp')   goTo(current - 1);
   if (e.key === 'Home') goTo(0);
   if (e.key === 'End')  goTo(totalPages - 1);
-});
-
-// ── Dots click ────────────────────────────────────────────────
-dots.forEach(dot => {
-  dot.addEventListener('click', () => goTo(parseInt(dot.dataset.page)));
 });
 
 // ── Nav links click ───────────────────────────────────────────
