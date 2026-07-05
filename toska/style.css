@@ -280,8 +280,8 @@ img { max-width: 100%; display: block; }
     to bottom,
     transparent 0%,
     transparent 33%,
-    rgba(255, 255, 255, 0.6) 55%,
-    #ffffff 80%
+    rgba(255, 255, 255, 0.6) 60%,
+    var(--bg-primary) 100%
   );
 }
 
