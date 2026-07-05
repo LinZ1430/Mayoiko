@@ -31,25 +31,20 @@ jobs:
           bucket = os.environ['COS_BUCKET']
           total, ok, fail = 0, 0, 0
 
+          skip_dirs = {'.git', '.github'}
           for root, dirs, files in os.walk('.'):
-              dirs[:] = [d for d in dirs if not d.startswith('.')]
+              dirs[:] = [d for d in dirs if d not in skip_dirs]
               for name in files:
-                  if name.startswith('.'):
-                      continue
                   local = os.path.join(root, name)
-                  key = local.lstrip('./')
+                  key = local[2:]  # strip './'
                   total += 1
+                  print(f'  [{total}] {key} ... ', end='', flush=True)
                   try:
-                      resp = client.upload_file(
-                          Bucket=bucket,
-                          LocalFilePath=local,
-                          Key=key,
-                          EnableMD5=False
-                      )
-                      print(f'  OK  {key}')
+                      client.upload_file(Bucket=bucket, LocalFilePath=local, Key=key)
+                      print('OK')
                       ok += 1
                   except Exception as e:
-                      print(f'  FAIL  {key}  ({e})')
+                      print(f'ERR: {e}')
                       fail += 1
 
           print(f'\n{total} files: {ok} ok, {fail} failed')
