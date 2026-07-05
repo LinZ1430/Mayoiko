@@ -34,6 +34,9 @@ images.forEach(img => {
   });
 });
 
+let windowLoaded = false;
+window.addEventListener('load', () => { windowLoaded = true; });
+
 function dismissSplash() {
   splashBar.style.width = '100%';
   splashPct.textContent = '100%';
@@ -48,8 +51,8 @@ function tick() {
   const timeProgress = (elapsed / BAR_DURATION) * 100;
   renderBar(timeProgress);
 
-  const allLoaded = loadedCount >= totalImages;
-  if (timeProgress >= 100 && allLoaded) {
+  const allImgLoaded = loadedCount >= totalImages;
+  if (timeProgress >= 100 && allImgLoaded && windowLoaded) {
     dismissSplash();
     return;
   }
@@ -57,6 +60,7 @@ function tick() {
 }
 
 requestAnimationFrame(tick);
+
 let current = 0;
 let busy = false;
 
