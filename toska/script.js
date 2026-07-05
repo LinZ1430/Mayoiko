@@ -61,20 +61,46 @@ function tick() {
 
 requestAnimationFrame(tick);
 
+const allPages = document.querySelectorAll('.page');
+const pageSlugs = ['index', 'about', 'info', 'content', 'register', 'faq', 'more'];
 let current = 0;
 let busy = false;
 
 // ── Navigation ────────────────────────────────────────────────
-function goTo(index) {
+function goTo(index, pushState = true) {
   if (index < 0 || index >= totalPages || index === current || busy) return;
   busy = true;
+  const prev = current;
   current = index;
 
-  pages.style.transform = `translateY(-${current * 100}vh)`;
+  const targetPage = allPages[current];
+  const prevPage = allPages[prev];
+  const forward = current > prev;
+  const dir = forward ? 'fwd' : 'rev';
 
-  // Reset scroll position of the new page to top
-  const nextPage = document.querySelector(`.page[data-page="${current}"]`);
-  if (nextPage) nextPage.scrollTop = 0;
+  // Reset target scroll
+  if (targetPage) targetPage.scrollTop = 0;
+
+  // Old page exits
+  prevPage.classList.add('leaving', dir);
+  prevPage.classList.remove('active');
+
+  // New page enters
+  targetPage.classList.add('entering', dir);
+
+  // Cleanup after transition (use max of enter/exit speeds)
+  const enterSpeed = parseFloat(getComputedStyle(targetPage).getPropertyValue('--enter-speed')) * 1000 || 700;
+  const exitSpeed = parseFloat(getComputedStyle(prevPage).getPropertyValue('--exit-speed')) * 1000 || 500;
+  const duration = Math.max(enterSpeed, exitSpeed);
+
+  setTimeout(() => {
+    allPages.forEach(p => {
+      p.classList.remove('entering', 'leaving', 'fwd', 'rev');
+      p.style.clipPath = '';
+    });
+    targetPage.classList.add('active');
+    busy = false;
+  }, duration + 50);
 
   // Update dots
   dots.forEach((d, i) => d.classList.toggle('active', i === current));
@@ -82,34 +108,43 @@ function goTo(index) {
   // Update nav
   nav.classList.toggle('scrolled', current > 0);
 
-  setTimeout(() => { busy = false; }, 750);
+  // URL hash
+  if (pushState) {
+    history.pushState({ page: current }, '', `#${pageSlugs[current]}`);
+  }
 }
 
-function getPageEl() {
-  return document.querySelector(`.page[data-page="${current}"]`);
+// ── Hash routing ──────────────────────────────────────────────
+function handleHash() {
+  const hash = window.location.hash.replace('#', '');
+  const idx = pageSlugs.indexOf(hash);
+  if (idx >= 0 && idx !== current) goTo(idx, false);
 }
+window.addEventListener('hashchange', handleHash);
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.page !== undefined) goTo(e.state.page, false);
+});
 
-function isAtTop() {
-  const p = getPageEl();
-  return p && p.scrollTop <= 2;
-}
-
-function isAtBottom() {
-  const p = getPageEl();
-  return p && p.scrollTop + p.clientHeight >= p.scrollHeight - 5;
+// Init: activate correct page based on hash
+if (window.location.hash) {
+  const hash = window.location.hash.replace('#', '');
+  const idx = pageSlugs.indexOf(hash);
+  if (idx >= 0) {
+    current = idx;
+    allPages[idx].classList.add('active');
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    nav.classList.toggle('scrolled', idx > 0);
+  }
+} else {
+  allPages[0].classList.add('active');
+  history.replaceState({ page: 0 }, '', '#index');
 }
 
 // ── Wheel ─────────────────────────────────────────────────────
 window.addEventListener('wheel', (e) => {
-  if (e.deltaY > 20) {
-    if (!isAtBottom()) return;
-    e.preventDefault();
-    goTo(current + 1);
-  } else if (e.deltaY < -20) {
-    if (!isAtTop()) return;
-    e.preventDefault();
-    goTo(current - 1);
-  }
+  e.preventDefault();
+  if (e.deltaY > 20) goTo(current + 1);
+  else if (e.deltaY < -20) goTo(current - 1);
 }, { passive: false });
 
 // ── Touch ─────────────────────────────────────────────────────
@@ -120,14 +155,8 @@ window.addEventListener('touchstart', (e) => {
 window.addEventListener('touchend', (e) => {
   const dy = touchStartY - e.changedTouches[0].clientY;
   if (Math.abs(dy) <= 40) return;
-
-  if (dy > 0) {
-    if (!isAtBottom()) return;
-    goTo(current + 1);
-  } else {
-    if (!isAtTop()) return;
-    goTo(current - 1);
-  }
+  if (dy > 0) goTo(current + 1);
+  else goTo(current - 1);
 }, { passive: true });
 
 // ── Keyboard ──────────────────────────────────────────────────
