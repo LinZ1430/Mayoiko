@@ -23,21 +23,21 @@ jobs:
               SecretKey=os.environ['COS_SECRET_KEY']
           )
           client = CosS3Client(config)
+          bucket = os.environ['COS_BUCKET']
 
-          # List all files to upload
           for root, dirs, files in os.walk('.'):
-              if '.git' in root:
-                  continue
+              dirs[:] = [d for d in dirs if d != '.git']
               for f in files:
-                  local = os.path.join(root, f).replace('\\\\', '/').lstrip('./')
-                  key = local
-                  print(f'Uploading {local} -> {key}')
-                  client.upload_file(
-                      Bucket=os.environ['COS_BUCKET'],
-                      LocalFilePath=local,
-                      Key=key
-                  )
-          print('Deploy done')
+                  local = os.path.join(root, f)
+                  key = local.lstrip('./')
+                  print(f'Uploading {key}', end=' ')
+                  try:
+                      client.upload_file(Bucket=bucket, LocalFilePath=local, Key=key)
+                      print('OK')
+                  except Exception as e:
+                      print(f'FAIL: {e}')
+
+          print('Done')
           "
         env:
           COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
