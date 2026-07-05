@@ -11,10 +11,15 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Upload to COS
+        env:
+          COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+          COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+          COS_BUCKET: ${{ secrets.COS_BUCKET }}
+          COS_REGION: ${{ secrets.COS_REGION }}
         run: |
           pip install cos-python-sdk-v5
-          python -c "
-          import os, sys
+          python3 << 'PYEOF'
+          import os
           from qcloud_cos import CosConfig, CosS3Client
 
           config = CosConfig(
@@ -24,23 +29,30 @@ jobs:
           )
           client = CosS3Client(config)
           bucket = os.environ['COS_BUCKET']
+          total, ok, fail = 0, 0, 0
 
           for root, dirs, files in os.walk('.'):
-              dirs[:] = [d for d in dirs if d != '.git']
-              for f in files:
-                  local = os.path.join(root, f)
+              dirs[:] = [d for d in dirs if not d.startswith('.')]
+              for name in files:
+                  if name.startswith('.'):
+                      continue
+                  local = os.path.join(root, name)
                   key = local.lstrip('./')
-                  print(f'Uploading {key}', end=' ')
+                  total += 1
                   try:
-                      client.upload_file(Bucket=bucket, LocalFilePath=local, Key=key)
-                      print('OK')
+                      resp = client.upload_file(
+                          Bucket=bucket,
+                          LocalFilePath=local,
+                          Key=key,
+                          EnableMD5=False
+                      )
+                      print(f'  OK  {key}')
+                      ok += 1
                   except Exception as e:
-                      print(f'FAIL: {e}')
+                      print(f'  FAIL  {key}  ({e})')
+                      fail += 1
 
-          print('Done')
-          "
-        env:
-          COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
-          COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
-          COS_BUCKET: ${{ secrets.COS_BUCKET }}
-          COS_REGION: ${{ secrets.COS_REGION }}
+          print(f'\n{total} files: {ok} ok, {fail} failed')
+          if fail > 0:
+              raise SystemExit(1)
+          PYEOF
